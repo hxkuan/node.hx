@@ -1,4 +1,4 @@
-# commander简介
+# commander简介--node小工具开发
 
 ## 前言
 当下，作为一名js开发，不知道node那是不可原谅的。但很多同学不知道，node当下使用最多的不是后端开发，而是使用工具的开发，尤其是一些命令行程序。
@@ -149,3 +149,74 @@ function make_red(txt) {
     return colors.red(txt); //display the help text in red on the console
 }
 ```
+
+## 实践
+结下来，我们就来做个简单的命令行小工具，功能是输出 hi,welcome to use me。
+
+首先我们得创建一个项目，
+```shell
+$ mkdir npmrc-local
+$ cd npmrc-local
+$ npm init
+$ touch .gitignore
+$ mkdir bin
+$ mkdir lib
+$ touch bin/npmrc.js
+$ touch lib/index.js
+```
+修改package.json文件，添加bin字段，
+```Json
+{
+    "bin": {
+        "npmrc": "./bin/npm.js"
+    }
+}
+```
+修改bin/npmrc.js,
+```js
+#!/usr/bin/env node
+
+require('../lib/index')
+```
+修改lib/index.js,
+```js
+#!/usr/bin/env node
+
+var program = require('commander');
+
+// 使用 program.chdir 就能获得 -C/-chdir 后面的参数。(注意：不能使用program.C)
+program
+  .version('0.0.1')
+  .option('-N, --userName <path>', 'input name');
+
+program.parse(process.argv);
+
+if(program.userName){
+  console.log('hi "%s",welcome to use me',program.userName);
+}else {
+  console.log('hi ,welcome to use me');
+}
+
+
+console.log("my tool finished");
+```
+然后`npm link`,如此就可以在本地使用了。如：
+
+``` shell
+➜  npmrc-local ✗ npmrc-hx -h
+
+  Usage: npmrc-hx [options]
+
+
+  Options:
+
+    -V, --version          output the version number
+    -N, --userName <path>  input name
+    -h, --help             output usage information
+
+➜  npmrc-local ✗ npmrc-hx -N hxkuan
+hi "hxkuan",welcome to use me
+my tool finished
+
+```
+当然，你也可以对外发布到npm上面，在这里这方面就不继续开展了。
